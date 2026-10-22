@@ -4,18 +4,15 @@ import Link from "next/link";
 
 export default function ArtworkCard({ artwork }) {
   return (
-    <Link
-      href={`/artwork/${artwork.id}`}
-      className="group block"
-    >
+    <Link href={`/artwork/${artwork.id}`} className="group block">
       <article>
-        <div className="relative overflow-hidden rounded-xl bg-[#F0F0EB]">
+        <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-[#F0F0EB]">
           <Image
             src={artwork.image}
             alt={artwork.title}
-            width={600}
-            height={450}
-            className="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            fill
+            sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 33vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </div>
 

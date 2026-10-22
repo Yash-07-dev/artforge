@@ -7,8 +7,6 @@ import artworks from "../../data/artworks";
 
 export default function GalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState("All Artwork");
-  
-  //Add line
   const [searchQuery, setSearchQuery] = useState("");
 
   const categories = [
@@ -16,24 +14,23 @@ export default function GalleryPage() {
     ...new Set(artworks.map((artwork) => artwork.category)),
   ];
 
-  
-const filteredArtworks = artworks.filter((artwork) => {
-  const matchesCategory =
-    selectedCategory === "All Artwork" ||
-    artwork.category === selectedCategory;
-
   const query = searchQuery.trim().toLowerCase();
 
-  const matchesSearch =
-    artwork.title.toLowerCase().includes(query) ||
-    artwork.category.toLowerCase().includes(query);
+  const filteredArtworks = artworks.filter((artwork) => {
+    const matchesCategory =
+      selectedCategory === "All Artwork" ||
+      artwork.category === selectedCategory;
 
-  return matchesCategory && matchesSearch;
-});
+    const matchesSearch =
+      artwork.title.toLowerCase().includes(query) ||
+      artwork.category.toLowerCase().includes(query);
 
+    return matchesCategory && matchesSearch;
+  });
 
   return (
-    <main className="mx-auto min-h-screen max-w-7xl px-6 py-16">
+    <main className="mx-auto min-h-screen w-full max-w-7xl px-6 py-12">
+      {/* Gallery heading */}
       <section>
         <p className="text-sm font-semibold uppercase tracking-widest text-[#E86A33]">
           The ArtForge Collection
@@ -49,25 +46,23 @@ const filteredArtworks = artworks.filter((artwork) => {
         </p>
       </section>
 
+      {/* Search */}
+      <section className="mt-8">
+        <label htmlFor="gallery-search" className="sr-only">
+          Search artwork
+        </label>
 
-      
-<section className="mt-8">
-  <label htmlFor="gallery-search" className="sr-only">
-    Search artwork
-  </label>
+        <input
+          id="gallery-search"
+          type="search"
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+          placeholder="Search by artwork title or category..."
+          className="w-full max-w-xl rounded-xl border border-[#E5E5E5] bg-white px-4 py-3 text-sm outline-none focus:border-[#E86A33]"
+        />
+      </section>
 
-  <input
-    id="gallery-search"
-    type="search"
-    value={searchQuery}
-    onChange={(event) => setSearchQuery(event.target.value)}
-    placeholder="Search by artwork title or category..."
-    className="w-full max-w-xl rounded-xl border border-[#E5E5E5] bg-white px-4 py-3 text-sm outline-none focus:border-[#E86A33]"
-  />
-</section>
-
-
-      {/* Category filters */}
+      {/* Category filters and result count */}
       <section className="mt-10">
         <div className="flex flex-wrap gap-3">
           {categories.map((category) => (
@@ -87,51 +82,41 @@ const filteredArtworks = artworks.filter((artwork) => {
           ))}
         </div>
 
-        
-<p className="mb-5 text-sm text-[#6B6B6B]" aria-live="polite">
-  Showing {filteredArtworks.length}{" "}
-  {filteredArtworks.length === 1 ? "artwork" : "artworks"}
-</p>
-
+        <p className="mt-3 text-sm text-[#6B6B6B]" aria-live="polite">
+          Showing {filteredArtworks.length}{" "}
+          {filteredArtworks.length === 1 ? "artwork" : "artworks"}
+        </p>
       </section>
 
-      {/* Filtered artwork */}
-      <section className="mt-10">
+      {/* Artwork grid */}
+      <section className="mt-8">
         {filteredArtworks.length > 0 ? (
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 items-start gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {filteredArtworks.map((artwork) => (
               <ArtworkCard key={artwork.id} artwork={artwork} />
             ))}
           </div>
-        
-        
-
-
         ) : (
-          
-<div className="py-16 text-center">
-  <h2 className="text-xl font-semibold text-[#171717]">
-    No artwork found
-  </h2>
+          <div className="py-16 text-center">
+            <h2 className="text-xl font-semibold text-[#171717]">
+              No artwork found
+            </h2>
 
-  <p className="mt-2 text-sm text-[#6B6B6B]">
-    Try another search term or select a different category.
-  </p>
+            <p className="mt-2 text-sm text-[#6B6B6B]">
+              Try another search term or select a different category.
+            </p>
 
-  <button
-    type="button"
-    onClick={() => {
-      setSearchQuery("");
-      setSelectedCategory("All Artwork");
-    }}
-    className="mt-5 rounded-full bg-[#E86A33] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#C95425]"
-  >
-    Clear filters
-  </button>
-</div>
-
-
-
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedCategory("All Artwork");
+              }}
+              className="mt-5 rounded-full bg-[#E86A33] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#C95425]"
+            >
+              Clear filters
+            </button>
+          </div>
         )}
       </section>
     </main>
