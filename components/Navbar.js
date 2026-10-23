@@ -65,8 +65,14 @@ export default function Navbar() {
                 className="text-sm font-medium text-[#171717] hover:text-[#E86A33]"
               >
                 {link.label}
+
+
               </Link>
+
+
+
             ))}
+
           </div>
         )}
       </nav>
