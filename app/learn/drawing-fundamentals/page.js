@@ -1,5 +1,6 @@
 
 import Link from "next/link";
+import CourseProgress from "@/components/CourseProgress";
 
 export const metadata = {
   title: "Drawing Fundamentals | ArtForge",
@@ -38,6 +39,13 @@ const lessons = [
   },
 ];
 
+const lessonUrls = {
+  "01": "/learn/drawing-fundamentals/basic-shapes",
+  "02": "/learn/drawing-fundamentals/proportions",
+  "03": "/learn/drawing-fundamentals/perspective",
+  "04": "/learn/drawing-fundamentals/sketching",
+};
+
 export default function DrawingFundamentalsPage() {
   return (
     <main className="mx-auto min-h-screen w-full max-w-7xl px-6 py-12">
@@ -64,6 +72,9 @@ export default function DrawingFundamentalsPage() {
         </p>
       </section>
 
+      {/* Course Progress Dashboard */}
+      <CourseProgress />
+
       <section className="mt-12">
         <h2 className="text-2xl font-bold text-[#171717]">
           Your Learning Path
@@ -74,65 +85,47 @@ export default function DrawingFundamentalsPage() {
         </p>
 
         <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
-          
-{lessons.map((lesson) => {
-  const isClickable = lesson.number === "01" || lesson.number === "02"||lesson.number === "03" || lesson.number === "04";
+          {lessons.map((lesson) => {
+            const lessonUrl = lessonUrls[lesson.number];
 
-  const cardContent = (
-    <article
-      className={`rounded-xl border border-[#E5E5E5] bg-white p-6 transition ${
-        isClickable
-          ? "hover:border-[#E86A33] hover:shadow-sm"
-          : ""
-      }`}
-    >
-      <div className="flex items-start gap-4">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#FFF0E8] text-sm font-bold text-[#E86A33]">
-          {lesson.number}
-        </span>
+            const cardContent = (
+              <article className="rounded-xl border border-[#E5E5E5] bg-white p-6 transition hover:border-[#E86A33] hover:shadow-sm">
+                <div className="flex items-start gap-4">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#FFF0E8] text-sm font-bold text-[#E86A33]">
+                    {lesson.number}
+                  </span>
 
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-[#E86A33]">
-            {lesson.duration}
-          </p>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[#E86A33]">
+                      {lesson.duration}
+                    </p>
 
-          <h3 className="mt-2 text-lg font-semibold text-[#171717]">
-            {lesson.title}
-          </h3>
+                    <h3 className="mt-2 text-lg font-semibold text-[#171717]">
+                      {lesson.title}
+                    </h3>
 
-          <p className="mt-3 text-sm leading-7 text-[#6B6B6B]">
-            {lesson.description}
-          </p>
+                    <p className="mt-3 text-sm leading-7 text-[#6B6B6B]">
+                      {lesson.description}
+                    </p>
 
-          {isClickable && (
-            <p className="mt-4 text-sm font-semibold text-[#E86A33]">
-              Start lesson →
-            </p>
-          )}
-        </div>
-      </div>
-    </article>
-  );
+                    <p className="mt-4 text-sm font-semibold text-[#E86A33]">
+                      Start lesson →
+                    </p>
+                  </div>
+                </div>
+              </article>
+            );
 
-  const lessonUrl = {
-     "01": "/learn/drawing-fundamentals/basic-shapes",
-     "02": "/learn/drawing-fundamentals/proportions",
-     "03": "/learn/drawing-fundamentals/perspective",
-     "04": "/learn/drawing-fundamentals/sketching",
-  }[lesson.number];
-
-  return lessonUrl ? (
-    <Link
-      key={lesson.number}
-      href={lessonUrl}
-      className="block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E86A33]"
-    >
-      {cardContent}
-    </Link>
-  ) : (
-    <div key={lesson.number}>{cardContent}</div>
-  );
-})}
+            return (
+              <Link
+                key={lesson.number}
+                href={lessonUrl}
+                className="block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#E86A33]"
+              >
+                {cardContent}
+              </Link>
+            );
+          })}
         </div>
       </section>
     </main>

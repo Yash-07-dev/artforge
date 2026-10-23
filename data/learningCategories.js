@@ -19,7 +19,7 @@ const learningCategories = [
   {
     id: 3,
     title: "Color & Light",
-    slug: "Color & Light",
+    slug: "color-light",
     description:
       "Understand color harmony, values, lighting, and atmosphere in your art.",
     label: "Improve your visuals",
