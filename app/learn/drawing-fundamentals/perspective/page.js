@@ -2,8 +2,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LessonSidebar from "@/components/LessonSidebar";
+
+const STORAGE_KEY = "artforge-lesson-perspective-completed";
+const CHECKLIST_STORAGE_KEY = "artforge-lesson-perspective-checklist";
 
 const exercises = [
   "Draw a horizontal horizon line.",
@@ -15,8 +18,70 @@ export default function PerspectiveLessonPage() {
   const [completed, setCompleted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [checkedItems, setCheckedItems] = useState([false, false, false]);
+  const [isProgressLoaded, setIsProgressLoaded] = useState(false);
+  const [isChecklistLoaded, setIsChecklistLoaded] = useState(false);
 
   const completedExercises = checkedItems.filter(Boolean).length;
+
+  // Load saved lesson completion.
+  useEffect(() => {
+    try {
+      const savedProgress = localStorage.getItem(STORAGE_KEY);
+      setCompleted(savedProgress === "true");
+    } catch (error) {
+      console.error("Unable to load lesson progress:", error);
+    } finally {
+      setIsProgressLoaded(true);
+    }
+  }, []);
+
+  // Save lesson completion.
+  useEffect(() => {
+    if (!isProgressLoaded) return;
+
+    try {
+      localStorage.setItem(STORAGE_KEY, String(completed));
+    } catch (error) {
+      console.error("Unable to save lesson progress:", error);
+    }
+  }, [completed, isProgressLoaded]);
+
+  // Load saved checklist items.
+  useEffect(() => {
+    try {
+      const savedItems = localStorage.getItem(CHECKLIST_STORAGE_KEY);
+
+      if (savedItems) {
+        const parsedItems = JSON.parse(savedItems);
+
+        if (
+          Array.isArray(parsedItems) &&
+          parsedItems.length === exercises.length &&
+          parsedItems.every((item) => typeof item === "boolean")
+        ) {
+          setCheckedItems(parsedItems);
+        }
+      }
+    } catch (error) {
+      console.error("Unable to load checklist progress:", error);
+    } finally {
+      setIsChecklistLoaded(true);
+    }
+  }, []);
+
+  // Save checklist items.
+  useEffect(() => {
+    if (!isChecklistLoaded) return;
+
+    try {
+      localStorage.setItem(
+        CHECKLIST_STORAGE_KEY,
+        JSON.stringify(checkedItems)
+      );
+    } catch (error) {
+      console.error("Unable to save checklist progress:", error);
+    }
+  }, [checkedItems, isChecklistLoaded]);
 
   return (
     <main className="min-h-screen w-full px-6 py-12">
@@ -97,6 +162,7 @@ export default function PerspectiveLessonPage() {
                     <input
                       type="checkbox"
                       checked={checkedItems[index]}
+                      disabled={!isChecklistLoaded}
                       onChange={() =>
                         setCheckedItems((previous) =>
                           previous.map((checked, itemIndex) =>
@@ -114,14 +180,19 @@ export default function PerspectiveLessonPage() {
 
             <button
               type="button"
+              disabled={!isProgressLoaded}
               onClick={() => setCompleted((previous) => !previous)}
               className={`mt-8 rounded-full px-6 py-3 text-sm font-semibold transition ${
                 completed
                   ? "border border-[#E86A33] bg-white text-[#E86A33]"
                   : "bg-[#E86A33] text-white hover:bg-[#C95425]"
-              }`}
+              } disabled:cursor-wait disabled:opacity-60`}
             >
-              {completed ? "Mark as incomplete" : "Mark lesson as complete"}
+              {!isProgressLoaded
+                ? "Loading progress..."
+                : completed
+                  ? "Mark as incomplete"
+                  : "Mark lesson as complete"}
             </button>
 
             {completed && (

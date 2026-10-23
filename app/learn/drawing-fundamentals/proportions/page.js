@@ -2,13 +2,18 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LessonSidebar from "@/components/LessonSidebar";
+
+const STORAGE_KEY = "artforge-lesson-proportions-completed";
+const CHECKLIST_STORAGE_KEY = "artforge-lesson-proportions-checklist";
 
 export default function ProportionsLessonPage() {
   const [completed, setCompleted] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [checkedItems, setCheckedItems] = useState([false, false, false]);
+  const [isProgressLoaded, setIsProgressLoaded] = useState(false);
+  const [isChecklistLoaded, setIsChecklistLoaded] = useState(false);
 
   const exercises = [
     "Draw three objects using simple shapes.",
@@ -17,6 +22,66 @@ export default function ProportionsLessonPage() {
   ];
 
   const completedExercises = checkedItems.filter(Boolean).length;
+
+  // Load saved completion status.
+  useEffect(() => {
+    try {
+      const savedProgress = localStorage.getItem(STORAGE_KEY);
+      setCompleted(savedProgress === "true");
+    } catch (error) {
+      console.error("Unable to load lesson progress:", error);
+    } finally {
+      setIsProgressLoaded(true);
+    }
+  }, []);
+
+  // Load saved checklist items.
+useEffect(() => {
+  try {
+    const savedItems = localStorage.getItem(CHECKLIST_STORAGE_KEY);
+
+    if (savedItems) {
+      const parsedItems = JSON.parse(savedItems);
+
+      if (
+        Array.isArray(parsedItems) &&
+        parsedItems.length === 3 &&
+        parsedItems.every((item) => typeof item === "boolean")
+      ) {
+        setCheckedItems(parsedItems);
+      }
+    }
+  } catch (error) {
+    console.error("Unable to load checklist progress:", error);
+  } finally {
+    setIsChecklistLoaded(true);
+  }
+}, []);
+
+// Save checklist items whenever they change.
+useEffect(() => {
+  if (!isChecklistLoaded) return;
+
+  try {
+    localStorage.setItem(
+      CHECKLIST_STORAGE_KEY,
+      JSON.stringify(checkedItems)
+    );
+  } catch (error) {
+    console.error("Unable to save checklist progress:", error);
+  }
+}, [checkedItems, isChecklistLoaded]);
+
+  // Save completion status whenever it changes.
+  useEffect(() => {
+    if (!isProgressLoaded) return;
+
+    try {
+      localStorage.setItem(STORAGE_KEY, String(completed));
+    } catch (error) {
+      console.error("Unable to save lesson progress:", error);
+    }
+  }, [completed, isProgressLoaded]);
 
   return (
     <main className="min-h-screen w-full px-6 py-12">
@@ -83,6 +148,7 @@ export default function ProportionsLessonPage() {
                 <p className="font-semibold text-[#171717]">
                   Practice checklist
                 </p>
+
                 <p className="text-sm text-[#6B6B6B]" aria-live="polite">
                   {completedExercises} of {exercises.length} completed
                 </p>
@@ -106,6 +172,7 @@ export default function ProportionsLessonPage() {
                       }
                       className="mt-1 accent-[#E86A33]"
                     />
+
                     <span>{exercise}</span>
                   </label>
                 ))}
@@ -114,14 +181,19 @@ export default function ProportionsLessonPage() {
 
             <button
               type="button"
+              disabled={!isProgressLoaded}
               onClick={() => setCompleted((previous) => !previous)}
               className={`mt-8 rounded-full px-6 py-3 text-sm font-semibold transition ${
                 completed
                   ? "border border-[#E86A33] bg-white text-[#E86A33]"
                   : "bg-[#E86A33] text-white hover:bg-[#C95425]"
-              }`}
+              } disabled:cursor-wait disabled:opacity-60`}
             >
-              {completed ? "Mark as incomplete" : "Mark lesson as complete"}
+              {!isProgressLoaded
+                ? "Loading progress..."
+                : completed
+                  ? "Mark as incomplete"
+                  : "Mark lesson as complete"}
             </button>
 
             {completed && (
