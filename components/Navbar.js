@@ -35,7 +35,17 @@ export default function Navbar() {
               >
                 {link.label}
               </Link>
+
             ))}
+
+
+            <Link
+              href="/community"
+              className="text-sm font-medium text-[#171717] hover:text-[#E86A33]"
+            >
+              Community
+            </Link>
+
           </div>
 
           {/* Mobile menu button */}
@@ -71,7 +81,15 @@ export default function Navbar() {
 
 
 
+
             ))}
+
+            <Link
+              href="/community"
+              className="text-sm font-medium text-[#171717] hover:text-[#E86A33]"
+            >
+              Community
+            </Link>
 
           </div>
         )}

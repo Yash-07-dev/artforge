@@ -4,7 +4,7 @@ const artworks = [
     id: 1,
     title: "Dreamscape",
     category: "Digital Painting",
-    image: "/artworks/dreamscape.jpg",
+    image: "/artworks/image1.jpg",
     description:
        "An exploration of atmosphere, composition, and visual storytelling",
   },
@@ -12,7 +12,7 @@ const artworks = [
     id: 2,
     title: "Color Study",
     category: "Color & Light",
-    image: "/artworks/color-study.jpg",
+    image: "/artworks/image2.jpg",
     description:
         "study the color and light",
   },
@@ -20,7 +20,7 @@ const artworks = [
     id: 3,
     title: "Quiet Moments",
     category: "Illustration",
-    image: "/artworks/quiet-moments.jpg",
+    image: "/artworks/image3.jpg",
     description:
          "Let's create illustration",
   },
