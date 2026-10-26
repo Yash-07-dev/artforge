@@ -5,6 +5,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const artworkRoutes = require("./routes/artworkRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -38,8 +39,10 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Artwork API routes
+// Artwork API routes and auth route
 app.use("/api/artworks", artworkRoutes);
+
+app.use("/api/auth", authRoutes);
 
 // Connect to MongoDB before starting the server
 async function startServer() {
