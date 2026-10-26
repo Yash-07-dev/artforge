@@ -29,7 +29,7 @@ router.get("/", async (req, res) => {
 
 
 // POST /api/artworks - create artwork
-router.post("/",authMiddleware, async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
   try {
     const { title, description, imageUrl, category, artistName } = req.body;
 
@@ -39,6 +39,7 @@ router.post("/",authMiddleware, async (req, res) => {
       imageUrl,
       category,
       artistName,
+      owner: req.user.userId,
     });
 
     res.status(201).json({
@@ -101,7 +102,7 @@ router.get("/:id", validateArtworkId, async (req, res) => {
 });
 
 // PUT /api/artworks/:id - update artwork
-router.put("/:id", authMiddleware, async (req, res) => {
+router.put("/:id", authMiddleware, validateArtworkId, async (req, res) => {
   try {
     const allowedFields = [
       "title",
@@ -127,7 +128,10 @@ router.put("/:id", authMiddleware, async (req, res) => {
     }
 
     const artwork = await Artwork.findByIdAndUpdate(
-      req.params.id,
+      {
+        _id: req.params.id,
+        owner: req.user.userId,
+      },
       { $set: updates },
       {
         new: true,
@@ -164,9 +168,12 @@ router.put("/:id", authMiddleware, async (req, res) => {
 });
 
 // DELETE /api/artworks/:id - delete artwork
-router.delete("/:id", authMiddleware, async (req, res) => {
+router.delete("/:id", authMiddleware, validateArtworkId, async (req, res) => {
   try {
-    const artwork = await Artwork.findByIdAndDelete(req.params.id);
+    const artwork = await Artwork.findOneAndDelete({
+      _id: req.params.id,
+      owner: req.user.userId,
+    });
 
     if (!artwork) {
       return res.status(404).json({

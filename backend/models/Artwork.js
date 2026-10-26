@@ -34,6 +34,13 @@ const artworkSchema = new mongoose.Schema(
       required: [true, "Artist name is required"],
       trim: true,
     },
+
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: false,
+      default: null,
+    },
   },
   {
     timestamps: true,
