@@ -1,24 +1,22 @@
 
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 require("dotenv").config();
 
-
 const artworkRoutes = require("./routes/artworkRoutes");
-const cors = require("cors");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(express.json());
-
-app.use("/api/artworks", artworkRoutes);
-
+// Middleware: register before API routes
 app.use(
   cors({
     origin: "http://localhost:3000",
   })
 );
+
+app.use(express.json());
 
 // Basic test route
 app.get("/", (req, res) => {
@@ -39,6 +37,9 @@ app.get("/api/health", (req, res) => {
         : "disconnected",
   });
 });
+
+// Artwork API routes
+app.use("/api/artworks", artworkRoutes);
 
 // Connect to MongoDB before starting the server
 async function startServer() {

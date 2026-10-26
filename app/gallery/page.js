@@ -1,13 +1,67 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ArtworkCard from "../../components/ArtworkCard";
-import artworks from "../../data/artworks";
+import sampleArtworks from "../../data/artworks";
+
+const API_URL = "http://localhost:5000/api/artworks";
 
 export default function GalleryPage() {
+  const [artworks, setArtworks] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All Artwork");
   const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function fetchArtworks() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await fetch(API_URL, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error("Unable to load artwork from the server.");
+        }
+
+        const result = await response.json();
+
+        if (!result.success || !Array.isArray(result.data)) {
+          throw new Error("The server returned an unexpected response.");
+        }
+
+        const normalizedArtworks = result.data.map((artwork) => ({
+          ...artwork,
+          id: artwork._id || artwork.id,
+          image: artwork.imageUrl || artwork.image,
+        }));
+
+        setArtworks(normalizedArtworks);
+      } catch (err) {
+        if (err.name === "AbortError") return;
+
+        console.error("Gallery API error:", err);
+        setError(
+          "Couldn't load artwork from the database. Showing sample artwork instead."
+        );
+        setArtworks(sampleArtworks);
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchArtworks();
+
+    return () => controller.abort();
+  }, []);
 
   const categories = [
     "All Artwork",
@@ -62,6 +116,19 @@ export default function GalleryPage() {
         />
       </section>
 
+      {/* Loading and error messages */}
+      {loading && (
+        <p className="mt-6 text-sm text-[#6B6B6B]" role="status">
+          Loading artwork...
+        </p>
+      )}
+
+      {error && (
+        <p className="mt-6 text-sm text-amber-700" role="status">
+          {error}
+        </p>
+      )}
+
       {/* Category filters and result count */}
       <section className="mt-10">
         <div className="flex flex-wrap gap-3">
@@ -90,10 +157,17 @@ export default function GalleryPage() {
 
       {/* Artwork grid */}
       <section className="mt-8">
-        {filteredArtworks.length > 0 ? (
+        {loading ? (
+          <p className="py-12 text-center text-sm text-[#6B6B6B]">
+            Please wait while we load the gallery.
+          </p>
+        ) : filteredArtworks.length > 0 ? (
           <div className="grid grid-cols-1 items-start gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {filteredArtworks.map((artwork) => (
-              <ArtworkCard key={artwork.id} artwork={artwork} />
+              <ArtworkCard
+                key={artwork.id}
+                artwork={artwork}
+              />
             ))}
           </div>
         ) : (
