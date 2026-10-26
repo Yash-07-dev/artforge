@@ -1,4 +1,5 @@
 
+const authMiddleware = require("../middleware/authMiddleware");
 const express = require("express");
 const mongoose = require("mongoose");
 const Artwork = require("../models/Artwork");
@@ -25,8 +26,10 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+
 // POST /api/artworks - create artwork
-router.post("/", async (req, res) => {
+router.post("/",authMiddleware, async (req, res) => {
   try {
     const { title, description, imageUrl, category, artistName } = req.body;
 
@@ -98,7 +101,7 @@ router.get("/:id", validateArtworkId, async (req, res) => {
 });
 
 // PUT /api/artworks/:id - update artwork
-router.put("/:id", validateArtworkId, async (req, res) => {
+router.put("/:id", authMiddleware, async (req, res) => {
   try {
     const allowedFields = [
       "title",
@@ -161,7 +164,7 @@ router.put("/:id", validateArtworkId, async (req, res) => {
 });
 
 // DELETE /api/artworks/:id - delete artwork
-router.delete("/:id", validateArtworkId, async (req, res) => {
+router.delete("/:id", authMiddleware, async (req, res) => {
   try {
     const artwork = await Artwork.findByIdAndDelete(req.params.id);
 
