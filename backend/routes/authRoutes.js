@@ -1,6 +1,7 @@
 
 const express = require("express");
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 
@@ -149,18 +150,29 @@ router.post("/login", async (req, res) => {
             });
         }
 
+
+        const jwt = require("jsonwebtoken");
+
         // Create a signed token that expires in one hour.
-        const token = require("jsonwebtoken").sign(
+        const token = jwt.sign(
             { userId: user._id.toString() },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
 
+        // Send the token in an HttpOnly cookie.
+        res.cookie("artforgeToken", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 60 * 60 * 1000,
+            path: "/",
+        });
+
         return res.status(200).json({
             success: true,
             message: "Login successful.",
             data: {
-                token,
                 user: {
                     id: user._id,
                     name: user.name,
@@ -168,6 +180,7 @@ router.post("/login", async (req, res) => {
                 },
             },
         });
+
     } catch (error) {
         console.error("Login error:", error.message);
 
@@ -177,6 +190,22 @@ router.post("/login", async (req, res) => {
         });
     }
 });
+
+
+router.post("/logout", (req, res) => {
+    res.clearCookie("artforgeToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+    });
+
+    return res.status(200).json({
+        success: true,
+        message: "Logged out successfully.",
+    });
+});
+
 
 
 module.exports = router;

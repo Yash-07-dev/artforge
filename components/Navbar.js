@@ -39,17 +39,22 @@ export default function Navbar() {
     };
   }, []);
 
-  function handleLogout() {
-    sessionStorage.removeItem("artforgeToken");
-    sessionStorage.removeItem("artforgeUser");
+  const handleLogout = async () => {
+    try {
+      await fetch("http://localhost:5000/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (error) {
+      console.error("Logout request failed:", error);
+    } finally {
+      sessionStorage.removeItem("artforgeToken");
+      sessionStorage.removeItem("artforgeUser");
 
-    setUser(null);
-    setIsMenuOpen(false);
-    window.dispatchEvent(new Event("artforge-auth-changed"));
-
-    router.push("/");
-    router.refresh();
-  }
+      window.dispatchEvent(new Event("artforge-auth-changed"));
+      router.push("/");
+    }
+  };
 
   const links = [
     { label: "Home", href: "/" },
