@@ -45,6 +45,8 @@ export default function LoginPage() {
         JSON.stringify(result.data.user)
       );
 
+      window.dispatchEvent(new Event("artforge-auth-changed"));
+
       router.push("/gallery");
     } catch {
       setError(
