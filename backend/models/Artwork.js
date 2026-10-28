@@ -22,6 +22,10 @@ const artworkSchema = new mongoose.Schema(
       required: [true, "Artwork image URL is required"],
       trim: true,
     },
+    cloudinaryPublicId: {
+      type: String,
+      default: null,
+    },
 
     category: {
       type: String,
@@ -44,7 +48,8 @@ const artworkSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
+
 );
 
 module.exports = mongoose.model("Artwork", artworkSchema);
